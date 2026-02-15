@@ -1,35 +1,43 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import { ReactFlowProvider } from "reactflow";
+import "reactflow/dist/style.css";
+import Canvas from "./components/Canvas";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [nodes, setNodes] = useState([
+    {
+      id: "1",
+      position: { x: 100, y: 100 },
+      data: { label: "Idea" },
+    },
+    {
+      id: "2",
+      position: { x: 400, y: 200 },
+      data: { label: "Feature" },
+    },
+    {
+      id: "3",
+      position: { x: 600, y: 300 },
+      data: { label: "Feature" },
+    },
+  ]);
+
+  const [edges, setEdges] = useState([
+    { id: "e1-2", source: "1", target: "2" },
+  ]);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="w-screen h-screen">
+      <ReactFlowProvider>
+        <Canvas
+          nodes={nodes}
+          setNodes={setNodes}
+          edges={edges}
+          setEdges={setEdges}
+        />
+      </ReactFlowProvider>
+    </div>
+  );
 }
 
-export default App
+export default App;
