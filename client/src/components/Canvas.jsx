@@ -6,16 +6,22 @@ import ReactFlow, {
   Controls,
   Background,
 } from "reactflow";
-import TextNode from "./TextNode.jsx";
-// import { useState } from "react";
+import TextNode from "./TextNode";
 
-
-// ✅ STATIC — defined outside component
 const nodeTypes = {
   textNode: TextNode,
 };
 
-function Canvas({ nodes, edges, setNodes, setEdges, setSelectedNodeId }) {
+function Canvas({
+  nodes,
+  edges,
+  setNodes,
+  setEdges,
+  setSelectedNodeId,
+  setSelectedEdgeId,
+  canvasTheme,
+  canvasPattern,
+}) {
   const onNodesChange = (changes) => {
     setNodes((nds) => applyNodeChanges(changes, nds));
   };
@@ -37,17 +43,45 @@ function Canvas({ nodes, edges, setNodes, setEdges, setSelectedNodeId }) {
     );
   };
 
-  const onSelectionChange = ({ nodes }) => {
-    if (nodes.length > 0) {
-      setSelectedNodeId(nodes[0].id);
-    } else {
-      setSelectedNodeId(null);
-    }
+ const onSelectionChange = ({ nodes, edges }) => {
+   if (nodes.length > 0) setSelectedNodeId(nodes[0].id);
+   else setSelectedNodeId(null);
+
+   if (edges.length > 0) setSelectedEdgeId(edges[0].id);
+   else setSelectedEdgeId(null);
+ };
+
+
+  const renderBackground = () => {
+    if (canvasPattern === "dots")
+      return (
+        <Background
+          variant="dots"
+          gap={20}
+          size={2}
+          color={canvasTheme === "dark" ? "#374151" : "#e5e7eb"}
+        />
+      );
+
+    if (canvasPattern === "grid")
+      return (
+        <Background
+          variant="lines"
+          gap={24}
+          size={1}
+          color={canvasTheme === "dark" ? "#374151" : "#e5e7eb"}
+        />
+      );
+
+    return null;
   };
 
-
   return (
-    <div className="w-full h-full bg-[#f6f7fb]">
+    <div
+      className={`w-full h-full ${
+        canvasTheme === "dark" ? "bg-slate-900" : "bg-[#f6f7fb]"
+      }`}
+    >
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -57,19 +91,10 @@ function Canvas({ nodes, edges, setNodes, setEdges, setSelectedNodeId }) {
         onConnect={onConnect}
         onSelectionChange={onSelectionChange}
         fitView
-        panOnDrag
-        zoomOnScroll
-        zoomOnPinch
-        panOnScroll
       >
-        <MiniMap
-          nodeColor={() => "#e5e7eb"}
-          nodeStrokeWidth={2}
-          zoomable
-          pannable
-        />
+        <MiniMap />
         <Controls />
-        <Background gap={24} size={1} color="#e5e7eb" />
+        {renderBackground()}
       </ReactFlow>
     </div>
   );
