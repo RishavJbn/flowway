@@ -19,7 +19,7 @@ function TextNode({ id, data }) {
   };
 
   return (
-    <div className="bg-white border rounded shadow px-5 py-4 relative min-w-[160px] cursor-move">
+    <div className="bg-white border rounded shadow px-5 py-4 relative min-w-40 cursor-move">
       {/* delete */}
       <button
         onClick={(e) => {
