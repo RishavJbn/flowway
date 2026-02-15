@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { ReactFlowProvider } from "reactflow";
 import "reactflow/dist/style.css";
 import Canvas from "./components/Canvas.jsx";
-import Toolbar from "./components/Toolbar.jsx";
 import FloatingToolbar from "./components/FloatingToolbar.jsx";
 
 function App() {
@@ -26,11 +25,11 @@ function App() {
   });
 
   const [selectedNodeId, setSelectedNodeId] = useState(null);
+  const [selectedEdgeId, setSelectedEdgeId] = useState(null);
   
   const [canvasTheme, setCanvasTheme] = useState("light");
 const [canvasPattern, setCanvasPattern] = useState("grid");
 
-const [selectedEdgeId, setSelectedEdgeId] = useState(null);
 
 
 
@@ -65,9 +64,8 @@ const [selectedEdgeId, setSelectedEdgeId] = useState(null);
   return (
     <div className="w-screen h-screen">
       <ReactFlowProvider>
-        <Toolbar addNode={addNode} />
-
         <FloatingToolbar
+          addNode={addNode}
           selectedNodeId={selectedNodeId}
           selectedEdgeId={selectedEdgeId}
           setNodes={setNodes}

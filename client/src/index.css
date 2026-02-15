@@ -10,33 +10,89 @@
   --pastel-green: #bbf7d0;
   --pastel-yellow: #fef9c3;
 }
-.toolbar-btn {
-  width: 34px;
-  height: 34px;
+/* ---------- TOOLBAR ---------- */
+.fw-toolbar {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+
+  background: rgba(255,255,255,0.65);
+  backdrop-filter: blur(14px);
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  box-shadow: 0 10px 35px rgba(0,0,0,0.08);
+
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ---------- BUTTON ---------- */
+.fw-btn {
+  width: 36px;
+  height: 36px;
   border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255,255,255,0.6);
-  border: 1px solid #e5e7eb;
-  transition: 0.15s;
+  background: transparent;
+  border: none;
+  transition: 0.18s;
 }
 
-.toolbar-btn:hover {
-  background: rgba(255,255,255,0.9);
-  transform: scale(1.05);
+.fw-btn:hover {
+  background: rgba(0,0,0,0.06);
+  transform: scale(1.06);
 }
 
-.toolbar-pop {
-  position: absolute;
-  top: 65px;
+.fw-btn.primary {
+  background: #6366f1;
+  color: white;
+}
+
+.fw-btn.dark {
+  background: #0f172a;
+  color: white;
+}
+
+/* ---------- DIVIDER ---------- */
+.fw-divider {
+  width: 1px;
+  height: 24px;
+  background: #e5e7eb;
+  margin: 0 4px;
+}
+
+/* ---------- PANEL ---------- */
+.fw-panel {
+  position: fixed;
+  top: 80px;
   left: 50%;
   transform: translateX(-50%);
+  z-index: 10000;
+
   background: white;
-  border-radius: 14px;
-  box-shadow: 0 12px 25px rgba(0,0,0,0.08);
+  border-radius: 16px;
+  box-shadow: 0 12px 35px rgba(0,0,0,0.12);
   padding: 8px;
+
   display: flex;
   gap: 8px;
-  z-index: 60;
+}
+
+/* ---------- COLOR DOT ---------- */
+.fw-color {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid #e5e7eb;
+}
+
+/* ---------- ANIM ---------- */
+@keyframes pop {
+  from { opacity:0; transform:translate(-50%, -10px); }
+  to { opacity:1; transform:translate(-50%, 0); }
 }

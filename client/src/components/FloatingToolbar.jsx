@@ -1,7 +1,22 @@
-import { useState } from "react";
-import { Palette, Square, Circle, Minus, Grid, Dot, Slash } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import {
+  Palette,
+  Square,
+  Circle,
+  Minus,
+  Grid3X3,
+  Dot,
+  Slash,
+  Moon,
+  Sun,
+  Plus,
+  ArrowRight,
+  ArrowRightCircle,
+  Minus as LineIcon,
+} from "lucide-react";
 
 function FloatingToolbar({
+  addNode,
   selectedNodeId,
   selectedEdgeId,
   setNodes,
@@ -10,12 +25,24 @@ function FloatingToolbar({
   setCanvasPattern,
 }) {
   const [activePanel, setActivePanel] = useState(null);
+  const toolbarRef = useRef();
+
+  /* ---------- close panel when clicking outside ---------- */
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (!toolbarRef.current?.contains(e.target)) {
+        setActivePanel(null);
+      }
+    };
+    window.addEventListener("mousedown", handleClick);
+    return () => window.removeEventListener("mousedown", handleClick);
+  }, []);
 
   const togglePanel = (panel) => {
     setActivePanel(activePanel === panel ? null : panel);
   };
 
-  /* ---------------- COLORS ---------------- */
+  /* ---------- NODE COLORS ---------- */
   const colors = [
     { key: "blue", bg: "#c7d2fe" },
     { key: "purple", bg: "#e9d5ff" },
@@ -26,7 +53,6 @@ function FloatingToolbar({
 
   const changeColor = (color) => {
     if (!selectedNodeId) return;
-
     setNodes((nds) =>
       nds.map((n) =>
         n.id === selectedNodeId ? { ...n, data: { ...n.data, color } } : n,
@@ -34,10 +60,9 @@ function FloatingToolbar({
     );
   };
 
-  /* ---------------- SHAPES ---------------- */
+  /* ---------- SHAPE ---------- */
   const changeShape = (shape) => {
     if (!selectedNodeId) return;
-
     setNodes((nds) =>
       nds.map((n) =>
         n.id === selectedNodeId ? { ...n, data: { ...n.data, shape } } : n,
@@ -45,10 +70,9 @@ function FloatingToolbar({
     );
   };
 
-  /* ---------------- EDGE ---------------- */
+  /* ---------- EDGE ---------- */
   const changeEdgeType = (type) => {
     if (!selectedEdgeId) return;
-
     setEdges((eds) =>
       eds.map((e) => (e.id === selectedEdgeId ? { ...e, type } : e)),
     );
@@ -56,179 +80,144 @@ function FloatingToolbar({
 
   const changeEdgeStyle = (styleType) => {
     if (!selectedEdgeId) return;
-
     setEdges((eds) =>
       eds.map((e) => {
         if (e.id !== selectedEdgeId) return e;
 
         if (styleType === "dashed")
-          return {
-            ...e,
-            style: { strokeDasharray: "5 5", strokeWidth: 2 },
-          };
+          return { ...e, style: { strokeDasharray: "5 5", strokeWidth: 2 } };
 
-        if (styleType === "thick")
-          return {
-            ...e,
-            style: { strokeWidth: 4 },
-          };
+        if (styleType === "thick") return { ...e, style: { strokeWidth: 4 } };
 
-        if (styleType === "normal")
-          return {
-            ...e,
-            style: { strokeWidth: 2 },
-          };
+        if (styleType === "normal") return { ...e, style: { strokeWidth: 2 } };
 
         return e;
       }),
     );
   };
 
-  /* ---------------- UI ---------------- */
-
   return (
-    <>
-      {/* MAIN TOOLBAR */}
-      <div
-        className="absolute top-4 left-1/2 -translate-x-1/2 
-        bg-white/70 backdrop-blur-md border border-gray-200 
-        rounded-2xl shadow-lg px-3 py-2 flex items-center gap-2 z-50"
-      >
+    <div ref={toolbarRef}>
+      {/* MAIN BAR */}
+      <div className="fw-toolbar">
+        {/* ADD NODE */}
+        <button className="fw-btn primary" onClick={addNode} title="Add node">
+          <Plus size={18} />
+        </button>
+
+        <div className="fw-divider" />
+
         {/* COLOR */}
-        <button onClick={() => togglePanel("color")} className="toolbar-btn">
+        <button
+          className="fw-btn"
+          onClick={() => togglePanel("color")}
+          title="Color"
+        >
           <Palette size={18} />
         </button>
 
         {/* SHAPE */}
-        <button onClick={() => togglePanel("shape")} className="toolbar-btn">
+        <button
+          className="fw-btn"
+          onClick={() => togglePanel("shape")}
+          title="Shape"
+        >
           <Square size={18} />
         </button>
 
         {/* EDGE */}
-        <button onClick={() => togglePanel("edge")} className="toolbar-btn">
+        <button
+          className="fw-btn"
+          onClick={() => togglePanel("edge")}
+          title="Edge"
+        >
           <Slash size={18} />
         </button>
 
         {/* CANVAS */}
-        <button onClick={() => togglePanel("canvas")} className="toolbar-btn">
-          <Grid size={18} />
+        <button
+          className="fw-btn"
+          onClick={() => togglePanel("canvas")}
+          title="Canvas"
+        >
+          <Grid3X3 size={18} />
         </button>
       </div>
 
-      {/* COLOR PANEL */}
+      {/* ---------- COLOR PANEL ---------- */}
       {activePanel === "color" && (
-        <div className="toolbar-pop">
+        <div className="fw-panel">
           {colors.map((c) => (
             <button
               key={c.key}
-              onClick={() => changeColor(c.key)}
-              className="w-7 h-7 rounded-full border"
+              className="fw-color"
               style={{ background: c.bg }}
+              onClick={() => changeColor(c.key)}
             />
           ))}
         </div>
       )}
 
-      {/* SHAPE PANEL */}
+      {/* ---------- SHAPE PANEL ---------- */}
       {activePanel === "shape" && (
-        <div className="toolbar-pop">
-          <button
-            onClick={() => changeShape("rounded")}
-            className="toolbar-btn"
-          >
+        <div className="fw-panel">
+          <button className="fw-btn" onClick={() => changeShape("rounded")}>
             <Square size={18} />
           </button>
-
-          <button onClick={() => changeShape("circle")} className="toolbar-btn">
+          <button className="fw-btn" onClick={() => changeShape("circle")}>
             <Circle size={18} />
           </button>
-
-          <button onClick={() => changeShape("pill")} className="toolbar-btn">
+          <button className="fw-btn" onClick={() => changeShape("pill")}>
             <Minus size={18} />
           </button>
         </div>
       )}
 
-      {/* EDGE PANEL */}
+      {/* ---------- EDGE PANEL ---------- */}
       {activePanel === "edge" && (
-        <div className="toolbar-pop">
+        <div className="fw-panel">
           <button
+            className="fw-btn"
             onClick={() => changeEdgeType("smoothstep")}
-            className="toolbar-btn"
           >
-            curved
+            <ArrowRight size={18} />
           </button>
-
-          <button
-            onClick={() => changeEdgeType("straight")}
-            className="toolbar-btn"
-          >
-            straight
+          <button className="fw-btn" onClick={() => changeEdgeType("straight")}>
+            <LineIcon size={18} />
           </button>
-
-          <button
-            onClick={() => changeEdgeStyle("dashed")}
-            className="toolbar-btn"
-          >
-            dashed
+          <button className="fw-btn" onClick={() => changeEdgeStyle("dashed")}>
+            <Slash size={18} />
           </button>
-
-          <button
-            onClick={() => changeEdgeStyle("thick")}
-            className="toolbar-btn"
-          >
-            thick
-          </button>
-
-          <button
-            onClick={() => changeEdgeStyle("normal")}
-            className="toolbar-btn"
-          >
-            normal
+          <button className="fw-btn" onClick={() => changeEdgeStyle("thick")}>
+            <ArrowRightCircle size={18} />
           </button>
         </div>
       )}
 
-      {/* CANVAS PANEL */}
+      {/* ---------- CANVAS PANEL ---------- */}
       {activePanel === "canvas" && (
-        <div className="toolbar-pop">
-          <button
-            onClick={() => setCanvasPattern("grid")}
-            className="toolbar-btn"
-          >
-            grid
+        <div className="fw-panel">
+          <button className="fw-btn" onClick={() => setCanvasPattern("grid")}>
+            <Grid3X3 size={18} />
           </button>
-
-          <button
-            onClick={() => setCanvasPattern("dots")}
-            className="toolbar-btn"
-          >
-            dots
+          <button className="fw-btn" onClick={() => setCanvasPattern("dots")}>
+            <Dot size={18} />
           </button>
-
-          <button
-            onClick={() => setCanvasPattern("blank")}
-            className="toolbar-btn"
-          >
-            blank
+          <button className="fw-btn" onClick={() => setCanvasPattern("blank")}>
+            <Square size={18} />
           </button>
-
-          <button
-            onClick={() => setCanvasTheme("light")}
-            className="toolbar-btn"
-          >
-            light
+          <button className="fw-btn" onClick={() => setCanvasTheme("light")}>
+            <Sun size={18} />
           </button>
-
           <button
+            className="fw-btn dark"
             onClick={() => setCanvasTheme("dark")}
-            className="toolbar-btn bg-slate-800 text-white"
           >
-            dark
+            <Moon size={18} />
           </button>
         </div>
       )}
-    </>
+    </div>
   );
 }
 

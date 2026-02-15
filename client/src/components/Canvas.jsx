@@ -92,7 +92,7 @@ function Canvas({
         onSelectionChange={onSelectionChange}
         fitView
       >
-        <MiniMap />
+        <MiniMap  className="border-2 border-blue-500 bg-gray-800"/>
         <Controls />
         {renderBackground()}
       </ReactFlow>
