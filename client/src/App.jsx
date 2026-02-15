@@ -25,7 +25,11 @@ function App() {
        ];
  });
 
- const [edges, setEdges] = useState(() => {
+
+
+ const [selectedNodeId, setSelectedNodeId] = useState(null);
+
+const [edges, setEdges] = useState(() => {
    const saved = localStorage.getItem("flowway-edges");
    return saved
      ? JSON.parse(saved)
@@ -40,6 +44,12 @@ function App() {
    localStorage.setItem("flowway-edges", JSON.stringify(edges));
  }, [edges]);
 
+ //random color 
+ const COLORS = ["blue", "purple", "pink", "green", "yellow"];
+const getRandomColor = () => {
+  return COLORS[Math.floor(Math.random() * COLORS.length)];
+};
+
 
 
   const addNode = () => {
@@ -48,8 +58,8 @@ function App() {
       {
         id: Date.now().toString(),
         type: "textNode",
-        position: { x: 300, y: 200 },
-        data: { label: "New Idea" },
+        position: { x: window.innerWidth / 4, y: window.innerHeight / 4 },
+        data: { label: "Text", color: getRandomColor() },
       },
     ]);
   };
@@ -63,6 +73,7 @@ function App() {
           edges={edges}
           setNodes={setNodes}
           setEdges={setEdges}
+          setSelectedNodeId={setSelectedNodeId}
         />
       </ReactFlowProvider>
     </div>

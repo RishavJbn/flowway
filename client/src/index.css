@@ -1,1 +1,12 @@
 @import "tailwindcss";
+:root {
+  --bg-canvas: #f6f7fb;
+  --node-white: rgba(255,255,255,0.7);
+  --node-border: #e5e7eb;
+
+  --pastel-blue: #c7d2fe;
+  --pastel-purple: #e9d5ff;
+  --pastel-pink: #fbcfe8;
+  --pastel-green: #bbf7d0;
+  --pastel-yellow: #fef9c3;
+}
