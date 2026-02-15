@@ -9,16 +9,19 @@ function App() {
   const [nodes, setNodes] = useState([
     {
       id: "1",
+      type: "textNode",
       position: { x: 100, y: 100 },
       data: { label: "Idea" },
     },
     {
       id: "2",
+      type: "textNode",
       position: { x: 400, y: 200 },
       data: { label: "Feature" },
     },
     {
       id: "3",
+      type: "textNode",
       position: { x: 600, y: 300 },
       data: { label: "Feature" },
     },
@@ -31,6 +34,7 @@ function App() {
   const addNode = () => {
     const newNode = {
       id: Date.now().toString(),
+      type: "textNode",
       position: {
         x: Math.random() * 500,
         y: Math.random() * 400,
