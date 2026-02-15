@@ -4,11 +4,13 @@ import ReactFlow, {
   applyEdgeChanges,
 } from "reactflow";
 import TextNode from "./TextNode.jsx";
-import { useMemo } from "react";
 
+// ✅ STATIC — defined outside component
+const nodeTypes = {
+  textNode: TextNode,
+};
 
-
-function Canvas({ nodes, setNodes, edges, setEdges }) {
+function Canvas({ nodes, edges, setNodes, setEdges }) {
   const onNodesChange = (changes) => {
     setNodes((nds) => applyNodeChanges(changes, nds));
   };
@@ -20,17 +22,6 @@ function Canvas({ nodes, setNodes, edges, setEdges }) {
   const onConnect = (connection) => {
     setEdges((eds) => addEdge(connection, eds));
   };
-  //text editing on nodes
-  // const nodeTypes = {
-  //   textNode: (props) => <TextNode {...props} setNodes={setNodes} />,
-  // };
-const nodeTypes = useMemo(
-  () => ({
-    textNode: (props) => <TextNode {...props} setNodes={setNodes} />,
-  }),
-  [setNodes],
-);
-
 
   return (
     <div className="w-full h-full">
