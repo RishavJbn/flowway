@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from "react";
+import logo from "../assets/flowway.jpg";
+
 import {
   Palette,
   Square,
@@ -17,6 +19,8 @@ import {
 
 function FloatingToolbar({
   addNode,
+  undo,
+  redo,
   selectedNodeId,
   selectedEdgeId,
   setNodes,
@@ -101,8 +105,23 @@ function FloatingToolbar({
       {/* MAIN BAR */}
       <div className="fw-toolbar">
         {/* ADD NODE */}
+        <div className="fw-logo-wrap">
+          <img src={logo} className="fw-logo-img" />
+        </div>
+
+        <div className="fw-divider" />
         <button className="fw-btn primary" onClick={addNode} title="Add node">
           <Plus size={18} />
+        </button>
+
+        <div className="fw-divider" />
+
+        <button className="fw-btn" onClick={undo}>
+          ↶
+        </button>
+
+        <button className="fw-btn" onClick={redo}>
+          ↷
         </button>
 
         <div className="fw-divider" />

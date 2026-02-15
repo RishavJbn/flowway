@@ -90,6 +90,24 @@
   border-radius: 50%;
   border: 1px solid #e5e7eb;
 }
+.fw-logo-img {
+  height: 32px;        /* keep toolbar size */
+  width: 120px;        /* or auto if you prefer */
+  object-fit: cover;   /* this zooms into image */
+  object-position: center;
+  transform: scale(1.7);   /* zoom level */
+  pointer-events: none;
+}
+
+.fw-logo-wrap {
+  height: 32px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+
+
 
 /* ---------- ANIM ---------- */
 @keyframes pop {
