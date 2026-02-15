@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { ReactFlowProvider } from "reactflow";
 import "reactflow/dist/style.css";
-import Canvas from "./components/Canvas";
+import Canvas from "./components/Canvas.jsx";
+import Toolbar from "./components/Toolbar.jsx";
+
 
 function App() {
   const [nodes, setNodes] = useState([
@@ -25,10 +27,25 @@ function App() {
   const [edges, setEdges] = useState([
     { id: "e1-2", source: "1", target: "2" },
   ]);
+ // adding  new node
+  const addNode = () => {
+    const newNode = {
+      id: Date.now().toString(),
+      position: {
+        x: Math.random() * 500,
+        y: Math.random() * 400,
+      },
+      data: { label: "New Idea" },
+    };
+
+    setNodes((nds) => [...nds, newNode]);
+  };
+
 
   return (
     <div className="w-screen h-screen">
       <ReactFlowProvider>
+        <Toolbar addNode={addNode} />
         <Canvas
           nodes={nodes}
           setNodes={setNodes}
