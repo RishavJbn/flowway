@@ -25,6 +25,7 @@ function FloatingToolbar({
   selectedEdgeId,
   setNodes,
   setEdges,
+  canvasTheme,
   setCanvasTheme,
   setCanvasPattern,
 }) {
@@ -225,14 +226,12 @@ function FloatingToolbar({
           <button className="fw-btn" onClick={() => setCanvasPattern("blank")}>
             <Square size={18} />
           </button>
-          <button className="fw-btn" onClick={() => setCanvasTheme("light")}>
-            <Sun size={18} />
-          </button>
-          <button
-            className="fw-btn dark"
-            onClick={() => setCanvasTheme("dark")}
+          <button 
+            className="fw-btn" 
+            onClick={() => setCanvasTheme(canvasTheme === "dark" ? "light" : "dark")}
+            title={canvasTheme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
           >
-            <Moon size={18} />
+            {canvasTheme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
           </button>
         </div>
       )}

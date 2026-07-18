@@ -46,15 +46,19 @@ function TextNode({ id, data, selected }) {
         ${selected ? "ring-2 ring-indigo-300" : ""}
       `}
     >
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          deleteNode();
-        }}
-        className="nodrag absolute -top-2 -right-2 bg-white border rounded-full w-5 h-5 text-xs"
-      >
-        ×
-      </button>
+      {selected && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            deleteNode();
+          }}
+          className="nodrag absolute -top-2.5 -right-2.5 bg-red-500 hover:bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center shadow-md border-none transition-all hover:scale-115 cursor-pointer duration-150 font-bold"
+          style={{ fontSize: "14px", paddingBottom: "2px" }}
+          title="Delete Node"
+        >
+          ×
+        </button>
+      )}
 
       <input
         value={data.label}

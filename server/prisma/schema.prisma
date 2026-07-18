@@ -1,0 +1,22 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Flow {
+  id        String   @id @default(uuid())
+  name      String   @default("Untitled Diagram")
+  nodes     Json     // stores array of flow nodes
+  edges     Json     // stores array of flow edges
+  theme     String   @default("light")
+  pattern   String   @default("grid")
+  userId    String   // Clerk user ID (e.g. user_...)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
