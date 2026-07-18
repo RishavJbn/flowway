@@ -29,6 +29,10 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', time: new Date() });
 });
 
-app.listen(PORT, () => {
-  console.log(`[server]: Flowway Backend running on http://localhost:${PORT}`);
-});
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`[server]: Flowway Backend running on http://localhost:${PORT}`);
+  });
+}
+
+export default app;

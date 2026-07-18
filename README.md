@@ -5,10 +5,9 @@
 <p align="center">
   <a href="https://flowway-pi.vercel.app/"><img src="https://img.shields.io/badge/demo-live-22c55e?style=for-the-badge" alt="Live Demo" /></a>
   <img src="https://img.shields.io/badge/license-unlicensed-lightgrey?style=for-the-badge" alt="License" />
-  <img src="https://img.shields.io/badge/version-0.0.0-blue?style=for-the-badge" alt="Version" />
-  <img src="https://img.shields.io/github/stars/RishavJbn/flowway?style=for-the-badge" alt="Stars" />
-  <img src="https://img.shields.io/github/issues/RishavJbn/flowway?style=for-the-badge" alt="Issues" />
-  <img src="https://img.shields.io/badge/stack-React%20%7C%20Vite%20%7C%20ReactFlow-7c3aed?style=for-the-badge" alt="Tech Stack" />
+  <img src="https://img.shields.io/badge/version-1.0.0-blue?style=for-the-badge" alt="Version" />
+  <img src="https://img.shields.io/badge/stack-React%20%7C%20Express%20%7C%20Postgres-6366f1?style=for-the-badge" alt="Tech Stack" />
+  <img src="https://img.shields.io/badge/auth-Clerk-00E0FF?style=for-the-badge" alt="Auth" />
 </p>
 
 <p align="center">
@@ -49,12 +48,13 @@ It helps users brainstorm, connect related thoughts, and iterate quickly on conc
 
 ### Key Features
 
-- Interactive node-based canvas powered by React Flow
-- Create and connect idea nodes
-- Node selection support
-- Canvas theming and pattern options
-- Undo/redo history state
-- Local persistence using browser `localStorage` (nodes + edges)
+- **Interactive Node Canvas**: Powered by React Flow for smooth creation and connecting of idea nodes.
+- **Clerk Authentication**: Secure Login, Signup, and User Account management integrated directly into the client-server loop.
+- **Sliding Left Workspace Sidebar**: Manage, create, search, and delete multiple diagram boards synced in the cloud when logged in.
+- **Debounced Autosave**: Changes to nodes, edges, canvas patterns, theme colors, or titles are automatically synced to PostgreSQL 1.5 seconds after typing or canvas adjustments.
+- **Offline Fallback Mode**: Instantly falls back to local storage if signed out or if keys are unconfigured, showing an warning badge but keeping the app completely functional offline.
+- **Global Keyboard Deletion**: Select nodes or connections and tap `Delete` or `Backspace` to delete them (safely ignored when typing in name or node input boxes).
+- **Undo/Redo History**: Local state snapshot wrappers to undo node placement, canvas styling, and connections.
 
 ### UI Preview
 
@@ -66,12 +66,12 @@ It helps users brainstorm, connect related thoughts, and iterate quickly on conc
 ### High-level Architecture
 
 ```mermaid
-flowchart LR
-  U[User] --> T[FloatingToolbar]
-  U --> C[Canvas]
-  T --> A[App State]
-  C --> A
-  A --> LS[(localStorage)]
+flowchart TD
+  User[User] --> Client[React Client (Vite)]
+  Client --> Auth[Clerk Auth SDK]
+  Client -->|Bearer JWT| Server[Express Server (TypeScript)]
+  Server -->|Prisma Client| DB[(PostgreSQL Database - Neon)]
+  Client -->|Offline Fallback| LS[(Browser localStorage)]
 ```
 
 ---
@@ -80,12 +80,15 @@ flowchart LR
 
 | Category | Technology | Purpose |
 |---|---|---|
-| Frontend Framework | React 19 | UI rendering and state-driven interactions |
-| Build Tool | Vite 7 | Dev server and production build |
-| Canvas/Graph Engine | React Flow (`reactflow`) | Node-edge diagram rendering and interactions |
-| Styling | Tailwind CSS 4 + CSS | Utility-first styling and component polish |
-| Icons | lucide-react | Toolbar and action icons |
-| Linting | ESLint 9 | Code quality and consistency |
+| **Frontend Framework** | React 19 | UI rendering and state-driven interactions |
+| **Build Tool** | Vite 7 | Dev server and production build |
+| **Canvas/Graph Engine** | React Flow (`reactflow`) | Node-edge diagram rendering and interactions |
+| **Authentication** | Clerk (`@clerk/clerk-react`) | Safe user authentication and JWT session generation |
+| **Backend Server** | Express (`@clerk/express`) | Node.js REST API server with Clerk token verification |
+| **Database ORM** | Prisma Client | Type-safe database queries and automated schema deployments |
+| **Database** | PostgreSQL (Neon DB) | Cloud database storing relational mindmap files in JSON formats |
+| **Styling** | Tailwind CSS 4 + CSS | Utility-first styling and glassmorphic interface designs |
+| **Icons** | lucide-react | Toolbar and action icons |
 
 ---
 
@@ -95,15 +98,12 @@ flowchart LR
 |---|---|
 | Node.js | **>= 18** (recommended LTS) |
 | npm | Comes with Node.js |
-| Git | Latest stable |
-
-No external API keys, backend services, or DB accounts are currently required for local development.
+| Database | **PostgreSQL** instance (e.g. Neon.tech, Supabase, or local) |
+| Auth Portal | **Clerk.com** account and set of API keys |
 
 ---
 
 ## Local Installation (Step-by-Step)
-
-> This project is frontend-only and currently lives under `client/`.
 
 ### 1) Clone the repository
 
@@ -112,74 +112,58 @@ git clone https://github.com/RishavJbn/flowway.git
 cd flowway
 ```
 
-### 2) Install dependencies
+### 2) Setup environment variables
 
+Create and configure your local environments.
+
+*   **For the Frontend Client**:
+    Create `client/.env.local` containing:
+    ```env
+    VITE_CLERK_PUBLISHABLE_KEY="pk_test_..."
+    ```
+
+*   **For the Backend Server**:
+    Create `server/.env` containing:
+    ```env
+    PORT=5000
+    DATABASE_URL="postgresql://user:password@hostname/dbname?sslmode=require"
+    CLERK_PUBLISHABLE_KEY="pk_test_..."
+    CLERK_SECRET_KEY="sk_test_..."
+    ```
+
+### 3) Install dependencies and push database schemas
+
+**Frontend Client Setup**:
 ```bash
 cd client
 npm install
 ```
 
-### 3) Environment setup
-
-No `.env.example` file is present and no runtime env vars are currently required.
-
-If you plan to add env vars later, create `client/.env` and document them in the section below.
+**Backend Server Setup**:
+```bash
+cd ../server
+npm install
+npm run prisma:push
+```
 
 ### 4) Run in development mode
 
-```bash
-npm run dev
-```
+Open separate terminal windows:
 
-### 5) Build for production
+*   **Start the Backend**:
+    ```bash
+    cd server
+    npm run dev
+    ```
+*   **Start the Frontend**:
+    ```bash
+    cd client
+    npm run dev
+    ```
 
-```bash
-npm run build
-```
-
-### 6) Preview production build locally
-
-```bash
-npm run preview
-```
-
-### 7) Run tests
-
-No test script is currently defined in `client/package.json`.
-
-### Default local URL/port
-
-Vite default:
-- `http://localhost:5173`
-
-### Troubleshooting
-
-<details>
-<summary><strong>Port 5173 already in use</strong></summary>
-
-Run Vite on a different port:
-
-```bash
-npm run dev -- --port 5174
-```
-</details>
-
-<details>
-<summary><strong>Dependencies fail to install</strong></summary>
-
-Try:
-
-```bash
-rm -rf node_modules package-lock.json
-npm install
-```
-</details>
-
-<details>
-<summary><strong>Blank screen after start</strong></summary>
-
-Check browser console for runtime errors and ensure `client/src/main.jsx` still mounts `<App />` into `#root`.
-</details>
+### Default local URLs
+- Frontend client: `http://localhost:5173`
+- Backend API server: `http://localhost:5000`
 
 ---
 
@@ -188,55 +172,52 @@ Check browser console for runtime errors and ensure `client/src/main.jsx` still 
 ```text
 flowway/
 ├─ README.md
-└─ client/
+├─ client/                  # Frontend Client Application (Vite + React)
+│  ├─ package.json
+│  ├─ vite.config.js
+│  ├─ .env.local
+│  └─ src/
+│     ├─ main.jsx
+│     ├─ App.jsx
+│     ├─ components/        # AuthControls, Canvas, Sidebar, TextNode
+│     ├─ hooks/             # useAuthSafe wrapping Clerk hooks
+│     └─ utils/             # api.js client queries
+└─ server/                  # Backend Express Server (TypeScript + Prisma)
    ├─ package.json
-   ├─ package-lock.json
-   ├─ vite.config.js
-   ├─ eslint.config.js
-   ├─ index.html
-   ├─ README.md
-   ├─ public/
+   ├─ tsconfig.json
+   ├─ .env
+   ├─ prisma/
+   │  └─ schema.prisma      # Prisma schema file definitions
    └─ src/
-      ├─ main.jsx
-      ├─ App.jsx
-      ├─ App.css
-      ├─ index.css
-      ├─ assets/
-      ├─ components/
-      └─ utils/
+      ├─ index.ts           # Server setup & CORS configurations
+      ├─ lib/
+      │  └─ db.ts           # Database connection client
+      └─ routes/
+         └─ flows.ts        # CRUD diagram controllers
 ```
 
 ### What each major part does
 
-- `client/src/main.jsx` — React app bootstrap and root render.
-- `client/src/App.jsx` — central state + orchestration of toolbar/canvas/features.
-- `client/src/components/` — reusable UI/graph interaction components.
-- `client/src/utils/` — utility helpers (if/when added).
-- `client/vite.config.js` — Vite + plugin configuration.
-- `client/eslint.config.js` — linting rules and standards.
+- `client/src/main.jsx` — React app bootstrap and conditional `<ClerkProvider>` configurations.
+- `client/src/App.jsx` — central canvas state + autosave syncing loops.
+- `client/src/hooks/useAuthSafe.js` — validates keys, preventing crashes if running locally offline.
+- `client/src/utils/api.js` — handles authenticated API fetch actions.
+- `server/src/routes/flows.ts` — validates user session tokens and maps Postgres CRUD actions.
 
 ---
 
 ## Core Logic / How It Works
 
-At runtime, `App.jsx` owns the primary graph state: `nodes`, `edges`, selection info, canvas preferences, and history stacks.  
-On first load, it hydrates graph data from `localStorage`; if none exists, a default starter node is created.
+At runtime, `App.jsx` controls the canvas graph state.
 
-### Main data flow
-
-1. App initializes `nodes` and `edges` from `localStorage`.
-2. UI actions (toolbar/canvas interactions) trigger state updates.
-3. Update wrappers (`updateNodes`, `updateEdges`) snapshot current state for undo/redo.
-4. State is persisted back to `localStorage` through `useEffect`.
-5. Canvas reflects latest state via props.
-
-### Key design decisions
-
-- **Lifted state in `App.jsx`**: keeps graph operations centralized and predictable.
-- **Local persistence**: no backend dependency; fast startup and offline-friendly behavior.
-- **History stacks (`history` + `future`)**: simple and understandable undo/redo model.
-
-### Sequence Diagram: Node Add + Persist
+### Syncing workflow
+1. If the user is **signed out** (or Clerk keys are missing):
+   * App operates in **Local Mode** using browser `localStorage` as a fallback.
+   * Diagram updates are saved locally. A warning badge alerts them they are in offline mode.
+2. If the user is **signed in**:
+   * App operates in **Cloud Mode**, query-fetching their boards from PostgreSQL.
+   * Editing nodes, adding elements, modifying canvas patterns, or changing titles triggers a **1.5s debounced autosave** updating the PostgreSQL database.
+   * Selecting or creating boards slides open the Left Workspace Sidebar for workspace switching.
 
 ```mermaid
 sequenceDiagram
@@ -277,38 +258,71 @@ sequenceDiagram
 
 ## API Documentation
 
-Not applicable right now.  
-This repository currently contains a frontend-only React/Vite application with no backend API routes.
+All routes expect a valid session token in the authorization header: `Authorization: Bearer <TOKEN>`.
+
+*   `GET /api/flows` - Get all saved flows belonging to the active user.
+*   `GET /api/flows/:id` - Fetch details for a specific flow (checks user ownership).
+*   `POST /api/flows` - Save and create a new diagram board.
+*   `PUT /api/flows/:id` - Update the nodes, edges, styling, and title of a flow.
+*   `DELETE /api/flows/:id` - Delete a flow by ID.
 
 ---
 
 ## Database Schema
 
-Not applicable right now.  
-No database integration is present; graph state is stored in browser `localStorage`.
+Prisma PostgreSQL schema model:
+
+```prisma
+model Flow {
+  id        String   @id @default(uuid())
+  name      String   @default("Untitled Diagram")
+  nodes     Json     // stores array of flow nodes
+  edges     Json     // stores array of flow edges
+  theme     String   @default("light")
+  pattern   String   @default("grid")
+  userId    String   // Clerk user ID
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+```
 
 ---
 
 ## Environment Variables Reference
 
-No environment variables are currently required.
+### Frontend Client variables (`client/.env.local`)
+| Variable | Description | Required |
+|---|---|---|
+| `VITE_CLERK_PUBLISHABLE_KEY` | Public publishable key for Clerk SDK | Yes |
 
-| Variable | Description | Example | Required |
-|---|---|---|---|
-| _None_ | No runtime env vars detected in current source | — | — |
+### Backend Server variables (`server/.env`)
+| Variable | Description | Required |
+|---|---|---|
+| `PORT` | Local port for server execution (defaults to 5000) | No |
+| `DATABASE_URL` | PostgreSQL database connection string | Yes |
+| `CLERK_PUBLISHABLE_KEY` | Public publishable key for Clerk SDK | Yes |
+| `CLERK_SECRET_KEY` | Private secret key for Clerk SDK verification | Yes |
 
 ---
 
 ## Scripts Reference
 
-From `client/package.json`:
-
+### Client Scripts (`client/package.json`)
 | Script | Command | Description |
 |---|---|---|
-| `npm run dev` | `vite` | Starts local dev server |
-| `npm run build` | `vite build` | Builds optimized production bundle |
-| `npm run lint` | `eslint .` | Lints all project files |
-| `npm run preview` | `vite preview` | Serves production build locally |
+| `npm run dev` | `vite` | Starts local Vite client server |
+| `npm run build` | `vite build` | Compiles frontend client code |
+| `npm run preview` | `vite preview` | Serves client build locally |
+
+### Server Scripts (`server/package.json`)
+| Script | Command | Description |
+|---|---|---|
+| `npm run dev` | `tsx watch src/index.ts` | Starts tsx hot-reloading development server |
+| `npm run build` | `tsc` | Compiles server TypeScript files |
+| `npm run prisma:generate` | `prisma generate` | Generates local Prisma client |
+| `npm run prisma:push` | `prisma db push` | Pushes schema changes directly to the PostgreSQL database |
 
 ---
 
@@ -400,25 +414,26 @@ No `CONTRIBUTING.md` file is currently present in the repository root.
 - [x] Interactive node canvas
 - [x] Local persistence for graph state
 - [x] Undo/redo
+- [x] Keyboard shortcuts (delete selected node/connection)
+- [x] Backend sync and Clerk auth integration
+- [x] Sliding left sidebar board management workspace
 - [ ] Export/import mind maps (JSON)
-- [ ] Keyboard shortcuts (add/delete/duplicate nodes)
 - [ ] Auto-layout options
 - [ ] Mini-map and advanced navigation
 - [ ] Collaboration mode (multi-user)
-- [ ] Backend sync and auth (optional)
 
 ---
 
 ## FAQ / Troubleshooting
 
 <details>
-<summary><strong>Where is the backend/API?</strong></summary>
-This version is frontend-only. No backend service is currently included in the repository.
+<summary><strong>Where is the database and how do I deploy the schema?</strong></summary>
+The schema is managed by Prisma and stored in a PostgreSQL database (e.g. on Neon). To push the schema to your database, simply run <code>npm run prisma:push</code> inside the <code>server/</code> directory.
 </details>
 
 <details>
-<summary><strong>Where is data stored?</strong></summary>
-In browser `localStorage` under keys such as `flowway-nodes` and `flowway-edges`.
+<summary><strong>Where is my data stored if I am not logged in?</strong></summary>
+If you are logged out (or haven't set up the API keys yet), the app runs in Offline Mode and saves your diagrams locally inside your browser's <code>localStorage</code> under <code>flowway-nodes</code> and <code>flowway-edges</code>.
 </details>
 
 <details>
